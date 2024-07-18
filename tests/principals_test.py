@@ -3,6 +3,15 @@ from core import db
 import pytest
 
 
+@pytest.fixture()
+def set_assignment_to_draft():
+    assignment = Assignment.get_by_id(5)
+    assignment.state = AssignmentStateEnum.DRAFT
+    db.session.commit()
+
+    yield assignment
+
+
 @pytest.fixture
 def assignment_to_grade():
     assignment = Assignment.get_by_id(4)
@@ -40,7 +49,9 @@ def test_get_assignments(client, h_principal):
         ]
 
 
-def test_grade_assignment_draft_assignment(client, h_principal):
+def test_grade_assignment_draft_assignment(
+    client, h_principal, set_assignment_to_draft
+):
     """
     failure case: If an assignment is in Draft state, it cannot be graded by principal
     """
