@@ -104,6 +104,9 @@ class Assignment(db.Model):
         assertions.assert_valid(
             grade is not None, "assignment with empty grade cannot be graded"
         )
+        assertions.assert_valid(
+            assignment.teacher_id == auth_principal.teacher_id, "FyleError"
+        )
 
         assignment.grade = grade
         assignment.state = AssignmentStateEnum.GRADED
@@ -134,8 +137,8 @@ class Assignment(db.Model):
         return cls.filter(cls.student_id == student_id).all()
 
     @classmethod
-    def get_assignments_by_teacher(cls):
-        return cls.query.all()
+    def get_assignments_by_teacher(cls, teacher_id):
+        return cls.filter(cls.teacher_id == teacher_id).all()
 
     @classmethod
     def get_submitted_and_graded_assignments(cls):
