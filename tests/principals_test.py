@@ -88,3 +88,37 @@ def test_regrade_assignment(client, h_principal, assignment_to_regrade):
 
     assert response.json["data"]["state"] == AssignmentStateEnum.GRADED.value
     assert response.json["data"]["grade"] == GradeEnum.B
+
+
+def test_wrong_grade(client, h_principal, assignment_to_regrade):
+    response = client.post(
+        "/principal/assignments/grade",
+        json={"id": 4, "grade": "z"},
+        headers=h_principal,
+    )
+
+    assert response.status_code == 400
+    data = response.json
+
+    assert data["error"] == "ValidationError"
+
+
+def test_principal_grade_assignment_bad_assignment(client, h_principal):
+    """
+    failure case: If an assignment does not exists check and throw 404
+    """
+    response = client.post(
+        "/principal/assignments/grade",
+        headers=h_principal,
+        json={"id": 100000, "grade": "A"},
+    )
+
+    assert response.status_code == 404
+    data = response.json
+
+    assert data["error"] == "FyleError"
+
+
+def test_get_teachers_list(client, h_principal):
+    response = client.get("/principal/teachers", headers=h_principal)
+    assert response.status_code == 200
