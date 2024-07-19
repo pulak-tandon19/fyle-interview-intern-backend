@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  flask_app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7755:7755"
+    volumes:
+      - .:/code
+    command: bash -c "chmod +x /code/run.sh && /code/run.sh"
